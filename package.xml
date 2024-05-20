@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>e2box_imu</name>
+  <version>1.0.0</version>
+  <description>The e2box_imu ros package</description>
+  <author email="menggu1234@naver.com">mjlee111</author>
+  <maintainer email="menggu1234@naver.com">mjlee111</maintainer>
+
+  <license>MIT</license>
+
+  <url>https://github.com/mjlee111/e2box_imu</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>std_msgs</build_depend>
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>sensor_msgs</build_export_depend>
+  <build_export_depend>std_msgs</build_export_depend>
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>sensor_msgs</exec_depend>
+  <exec_depend>std_msgs</exec_depend>
+
+  <export>
+
+  </export>
+</package>
