@@ -10,10 +10,12 @@ find_package(catkin REQUIRED COMPONENTS
 set( sources
   src/main.cpp
   src/t_serial.cpp
+  src/ebimu9dofv4.cpp
 )
 
 set( headers
   include/t_serial.h
+  include/ebimu9dofv4.h
 )
 
 catkin_package(

@@ -67,13 +67,16 @@ void t_serial::portClose() {
   }
 }
 
-void t_serial::deviceWrite(unsigned char data) {
+bool t_serial::deviceWrite(char *data, size_t size) {
   if (isConnected) {
-    int bytesWritten = write(serialPortFd, &data, 1);
+    int bytesWritten = write(serialPortFd, data, size);
     if (bytesWritten < 0) {
       std::cerr << "Failed to write to the port" << std::endl;
+      return false;
     }
+    return true;
   }
+  return false;
 }
 
 void t_serial::deviceRead() {
@@ -94,4 +97,9 @@ void t_serial::deviceReset() {
 
 int t_serial::getLength() { return data_length; }
 
-unsigned char *t_serial::getData() { return serialData; }
+unsigned char *t_serial::getData() {
+  rx_mut.lock();
+  deviceRead();
+  rx_mut.unlock();
+  return serialData;
+}

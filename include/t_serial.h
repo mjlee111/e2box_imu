@@ -5,6 +5,7 @@
 #include <fcntl.h>
 #include <iostream>
 #include <linux/serial.h>
+#include <mutex>
 #include <termios.h>
 #include <unistd.h>
 
@@ -18,7 +19,7 @@ public:
   // fuctions
   bool portOpen(char *device, const int baudrate);
   void portClose();
-  void deviceWrite(unsigned char);
+  bool deviceWrite(char *data, size_t size);
   void deviceRead();
   void deviceReset();
 
@@ -29,6 +30,7 @@ public:
   unsigned char *getData();
 
 private:
+  std::mutex rx_mut;
   int serialPortFd;
   bool isConnected;
   int data_length;

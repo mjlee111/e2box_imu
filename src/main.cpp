@@ -1,3 +1,4 @@
+#include "../include/ebimu9dofv4.h"
 #include "../include/t_serial.h"
 #include <cmath>
 #include <fstream>
@@ -9,12 +10,10 @@
 #include <string>
 #include <vector>
 
-t_serial serialInstance;
-
-ros::Publisher imu_data_publisher;
-
 std::string device, topic, frame;
 int baudrate;
+
+ros::Publisher imu_pub;
 
 float serialDataFloat[10];
 
@@ -37,7 +36,7 @@ void extractFloatData(const unsigned char *data, float *floatArray) {
   free(temp);
 }
 
-void handleIMUData(unsigned char *data, int length) {
+void handleIMUData(unsigned char *data) {
   sensor_msgs::Imu imu_msg_;
   // Parsing raw data
   float floatArray[10];
@@ -59,7 +58,7 @@ void handleIMUData(unsigned char *data, int length) {
   imu_msg_.linear_acceleration.z = floatArray[9];
 
   // Publish IMU data
-  imu_data_publisher.publish(imu_msg_);
+  imu_pub.publish(imu_msg_);
 }
 
 int main(int argc, char **argv) {
@@ -67,10 +66,10 @@ int main(int argc, char **argv) {
   ros::NodeHandle nh;
 
   ros::param::get("/e2box_imu_node/device", device);
-  std::cout << "Trying to open device : " << device;
+  std::cout << " Trying to open device : " << device << std::endl;
 
   ros::param::get("/e2box_imu_node/baudrate", baudrate);
-  std::cout << " Baudrate : " << baudrate;
+  std::cout << " Baudrate : " << baudrate << std::endl;
 
   ros::param::get("/e2box_imu_node/topic", topic);
   std::cout << " Publishing data as : " << topic << std::endl;
@@ -78,20 +77,15 @@ int main(int argc, char **argv) {
   ros::param::get("/e2box_imu_node/frame", frame);
   std::cout << " Data header frame : " << frame << std::endl;
 
-  if (!serialInstance.portOpen(const_cast<char *>(device.c_str()), baudrate)) {
-    ROS_ERROR("Failed to open device : %s", device.c_str());
-    return 0;
-  }
+  imu_pub = nh.advertise<sensor_msgs::Imu>(topic, 100);
 
-  imu_data_publisher = nh.advertise<sensor_msgs::Imu>(topic, 100);
-
-  ros::Rate loop_rate(100);
+  ros::Rate loop_rate(10);
+  ebimu imu(device, baudrate);
 
   while (ros::ok()) {
-    serialInstance.deviceRead();
-    int length = serialInstance.getLength();
-    unsigned char *data = serialInstance.getData();
-    handleIMUData(data, length);
+    handleIMUData(imu.readResponse());
+    ros::spinOnce();
+    loop_rate.sleep();
   }
 
   return 0;
